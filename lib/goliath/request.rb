@@ -87,7 +87,7 @@ module Goliath
         @env[SERVER_PORT] = port if port
       end
 
-      uri = URI(parser.request_url)
+      uri = URI.parse(parser.request_url)
       @env[REQUEST_METHOD]  = parser.http_method
       @env[REQUEST_URI]     = parser.request_url
       @env[QUERY_STRING]    = uri.query
@@ -96,6 +96,7 @@ module Goliath
       @env[REQUEST_PATH]    = uri.path
       @env[PATH_INFO]       = uri.path
       @env[FRAGMENT]        = uri.fragment
+      uri = nil
 
       yield if block_given?
 
