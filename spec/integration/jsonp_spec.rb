@@ -6,7 +6,7 @@ class JSON_API < Goliath::API
   use Goliath::Rack::Render, 'json'
 
   def response(env)
-    [200, {'CONTENT_TYPE' => 'application/json'}, "OK"]
+    [200, {'Content-Type' => 'application/json'}, "OK"]
   end
 end
 
@@ -16,7 +16,7 @@ describe 'JSONP' do
   it 'sets the content type' do
     with_api(JSON_API) do
       get_request({:query => {:callback => 'test'}}, err) do |c|
-        c.response_header['CONTENT_TYPE'].should =~ %r{^application/javascript}
+        c.response_header['Content-Type'].should =~ %r{^application/javascript}
       end
     end
   end
