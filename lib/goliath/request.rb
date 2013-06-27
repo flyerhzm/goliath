@@ -66,6 +66,23 @@ module Goliath
       @state = :processing
     end
 
+    def parse_uri(uri, escape=false)
+      begin
+        uri = URI.escape(uri, "[]") if escape
+        uri = URI.parse(uri)
+        return uri
+      rescue URI::InvalidURIError => e
+        unless escape
+          return parse_uri(uri, true)
+        else
+          server_exception(e)
+        end
+      rescue Exception => e
+        server_exception(e)
+      end
+    end
+
+
     # Invoked by connection when header parsing is complete.
     # This method is invoked only once per request.
     #
@@ -87,7 +104,8 @@ module Goliath
         @env[SERVER_PORT] = port if port
       end
 
-      uri = URI.parse(parser.request_url)
+      uri = parse_uri(parser.request_url)
+
       @env[REQUEST_METHOD]  = parser.http_method
       @env[REQUEST_URI]     = parser.request_url
       @env[QUERY_STRING]    = uri.query
