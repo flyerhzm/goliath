@@ -66,22 +66,14 @@ module Goliath
       @state = :processing
     end
 
-    def parse_uri(uri, escape=false)
+    def parse_uri(uri)
       begin
-        uri = URI.escape(uri, "[]") if escape
-        uri = URI.parse(uri)
-        return uri
-      rescue URI::InvalidURIError => e
-        unless escape
-          return parse_uri(uri, true)
-        else
-          server_exception(e)
-        end
-      rescue Exception => e
+        return URI.parse(uri)
+      rescue Exception
+        e = Goliath::Validation::BadRequestError.new("Reqeust URI is invalid, it's wrong or need escape.")
         server_exception(e)
       end
     end
-
 
     # Invoked by connection when header parsing is complete.
     # This method is invoked only once per request.
