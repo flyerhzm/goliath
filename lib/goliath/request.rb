@@ -98,15 +98,17 @@ module Goliath
 
       uri = parse_uri(parser.request_url)
 
-      @env[REQUEST_METHOD]  = parser.http_method
-      @env[REQUEST_URI]     = parser.request_url
-      @env[QUERY_STRING]    = uri.query
-      @env[HTTP_VERSION]    = parser.http_version.join('.')
-      @env[SCRIPT_NAME]     = uri.path
-      @env[REQUEST_PATH]    = uri.path
-      @env[PATH_INFO]       = uri.path
-      @env[FRAGMENT]        = uri.fragment
-      uri = nil
+      unless uri.nil?
+        @env[REQUEST_METHOD]  = parser.http_method
+        @env[REQUEST_URI]     = parser.request_url
+        @env[QUERY_STRING]    = uri.query
+        @env[HTTP_VERSION]    = parser.http_version.join('.')
+        @env[SCRIPT_NAME]     = uri.path
+        @env[REQUEST_PATH]    = uri.path
+        @env[PATH_INFO]       = uri.path
+        @env[FRAGMENT]        = uri.fragment
+        uri = nil
+      end
 
       yield if block_given?
 
