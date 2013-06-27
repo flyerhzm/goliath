@@ -66,6 +66,15 @@ module Goliath
       @state = :processing
     end
 
+    def parse_uri(uri)
+      begin
+        return URI.parse(uri)
+      rescue Exception
+        e = Goliath::Validation::BadRequestError.new("Reqeust URI is invalid, it's wrong or need escape.")
+        server_exception(e)
+      end
+    end
+
     # Invoked by connection when header parsing is complete.
     # This method is invoked only once per request.
     #
@@ -87,16 +96,19 @@ module Goliath
         @env[SERVER_PORT] = port if port
       end
 
-      uri = URI.parse(parser.request_url)
-      @env[REQUEST_METHOD]  = parser.http_method
-      @env[REQUEST_URI]     = parser.request_url
-      @env[QUERY_STRING]    = uri.query
-      @env[HTTP_VERSION]    = parser.http_version.join('.')
-      @env[SCRIPT_NAME]     = uri.path
-      @env[REQUEST_PATH]    = uri.path
-      @env[PATH_INFO]       = uri.path
-      @env[FRAGMENT]        = uri.fragment
-      uri = nil
+      uri = parse_uri(parser.request_url)
+
+      unless uri.nil?
+        @env[REQUEST_METHOD]  = parser.http_method
+        @env[REQUEST_URI]     = parser.request_url
+        @env[QUERY_STRING]    = uri.query
+        @env[HTTP_VERSION]    = parser.http_version.join('.')
+        @env[SCRIPT_NAME]     = uri.path
+        @env[REQUEST_PATH]    = uri.path
+        @env[PATH_INFO]       = uri.path
+        @env[FRAGMENT]        = uri.fragment
+        uri = nil
+      end
 
       yield if block_given?
 
